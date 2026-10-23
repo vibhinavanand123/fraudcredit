@@ -1,26 +1,33 @@
-import joblib
+import streamlit as st
 import pandas as pd
+import joblib
 
-# 1. Load the trained model saved in Step 1
+# Load trained model
 model = joblib.load('fraud_model.pkl')
 
-def evaluate_transaction(amount, distance, hour, is_international):
-    input_data = pd.DataFrame([{
-        'amount': float(amount),
-        'distance': float(distance),
-        'hour': int(hour),
-        'is_international': int(is_international)
+st.title("💳 Credit Card Fraud Detector")
+st.write("Enter transaction details below to evaluate risk.")
+
+# Inputs
+amount = st.number_input("Transaction Amount ($)", min_value=0.0, value=150.0)
+distance = st.number_input("Distance from Home (km)", min_value=0.0, value=12.0)
+hour = st.slider("Hour of Day (0-23)", 0, 23, 14)
+is_international = st.selectbox("Is International Transaction?", [0, 1], format_func=lambda x: "Yes" if x == 1 else "No")
+
+# Prediction
+if st.button("Evaluate Transaction"):
+    input_df = pd.DataFrame([{
+        'amount': amount,
+        'distance': distance,
+        'hour': hour,
+        'is_international': is_international
     }])
     
-    prediction = model.predict(input_data)[0]
-    probability = model.predict_proba(input_data)[0][1]
+    pred = model.predict(input_df)[0]
+    prob = model.predict_proba(input_df)[0][1]
     
-    return {
-        'status': 'FRAUD ALERT' if prediction == 1 else 'LEGITIMATE',
-        'fraud_probability': f"{probability:.2%}"
-    }
-
-if __name__ == '__main__':
-    # Test evaluation
-    sample_result = evaluate_transaction(amount=250.0, distance=45.0, hour=2, is_international=1)
-    print("Test Prediction Output:", sample_result)
+    st.divider()
+    if pred == 1:
+        st.error(f"🚨 **FRAUD ALERT** (Risk Score: {prob:.1%})")
+    else:
+        st.success(f"✅ **LEGITIMATE TRANSACTION** (Risk Score: {prob:.1%})")
