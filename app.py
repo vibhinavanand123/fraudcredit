@@ -9,8 +9,8 @@ st.title("💳 Credit Card Fraud Detector")
 st.write("Enter transaction details below to evaluate risk.")
 
 # Inputs
-amount = st.number_input("Transaction Amount ($)", min_value=0.0, value=150.0)
-distance = st.number_input("Distance from Home (km)", min_value=0.0, value=12.0)
+amount = st.number_input("Transaction Amount (Rs)", min_value=0.0, value=0.00)
+distance = st.number_input("Distance from Home (km)", min_value=0.0, value=0.0)
 hour = st.slider("Hour of Day (0-23)", 0, 23, 14)
 is_international = st.selectbox("Is International Transaction?", [0, 1], format_func=lambda x: "Yes" if x == 1 else "No")
 
